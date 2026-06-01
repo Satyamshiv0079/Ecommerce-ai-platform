@@ -1,22 +1,11 @@
-// app/(admin)/layout.tsx
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminHeader from '@/components/admin/AdminHeader';
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
-  // Protect all admin routes
-  if (!session || (session.user as any)?.role !== 'ADMIN') {
-    redirect('/login?callbackUrl=/admin/dashboard');
-  }
-
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
