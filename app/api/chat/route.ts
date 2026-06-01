@@ -2,9 +2,19 @@ import { createGroq } from '@ai-sdk/groq'
 import { streamText } from 'ai'
 import { NextRequest } from 'next/server'
 import { SHOPPING_ASSISTANT_PROMPT } from '@/lib/ai/prompts'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Please log in first' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
     const { messages } = await req.json()
 
     const groq = createGroq({
