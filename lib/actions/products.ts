@@ -3,6 +3,8 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const productSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -17,6 +19,12 @@ const productSchema = z.object({
 
 export async function createProduct(data: any) {
   try {
+    // 🔐 Security Check: Verify that user is logged in and is an ADMIN
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== 'ADMIN') {
+      return { success: false, error: "Unauthorized: Administrator access required" };
+    }
+
     const validated = productSchema.parse(data);
 
     const product = await prisma.product.create({
@@ -38,6 +46,12 @@ export async function createProduct(data: any) {
 
 export async function updateProduct(id: string, data: any) {
   try {
+    // 🔐 Security Check: Verify that user is logged in and is an ADMIN
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== 'ADMIN') {
+      return { success: false, error: "Unauthorized: Administrator access required" };
+    }
+
     const validated = productSchema.parse(data);
 
     const product = await prisma.product.update({
@@ -59,6 +73,12 @@ export async function updateProduct(id: string, data: any) {
 
 export async function deleteProduct(id: string) {
   try {
+    // 🔐 Security Check: Verify that user is logged in and is an ADMIN
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== 'ADMIN') {
+      return { success: false, error: "Unauthorized: Administrator access required" };
+    }
+
     await prisma.product.delete({
       where: { id },
     });

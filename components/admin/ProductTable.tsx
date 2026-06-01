@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import type { Product } from '@prisma/client';
+import { deleteProduct } from '@/lib/actions/products';
 
 interface ProductTableProps {
   products: Product[];
@@ -20,6 +21,19 @@ interface ProductTableProps {
 
 export function ProductTable({ products }: ProductTableProps) {
   const [data, setData] = useState(products);
+
+  const handleDelete = async (id: string, name: string) => {
+    const isConfirmed = confirm(`Are you sure you want to delete the product "${name}"?\nThis action cannot be undone.`);
+    
+    if (!isConfirmed) return;
+
+    const result = await deleteProduct(id);
+    if (result.success) {
+      setData((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      alert(result.error || "Failed to delete the product");
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border">
@@ -39,7 +53,7 @@ export function ProductTable({ products }: ProductTableProps) {
             <TableRow key={product.id}>
               <TableCell>
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-lg overflow-hidden bg-gray-100">
+                  <div className="h-12 w-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -70,13 +84,20 @@ export function ProductTable({ products }: ProductTableProps) {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <Link href={`/products/${product.slug}`} target="_blank">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                  <Button 
+                    onClick={() => handleDelete(product.id, product.name)}
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -88,3 +109,6 @@ export function ProductTable({ products }: ProductTableProps) {
     </div>
   );
 }
+
+// Inline import for Next Link since we added a target blank view icon redirect
+import Link from 'next/link';
