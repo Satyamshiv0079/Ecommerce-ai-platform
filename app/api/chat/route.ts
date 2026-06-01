@@ -1,6 +1,7 @@
 import { createGroq } from '@ai-sdk/groq'
 import { streamText } from 'ai'
 import { NextRequest } from 'next/server'
+import { SHOPPING_ASSISTANT_PROMPT } from '@/lib/ai/prompts'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,10 +13,7 @@ export async function POST(req: NextRequest) {
 
     const result = streamText({
       model: groq('llama-3.1-8b-instant'),
-      system: `You are a helpful shopping assistant for ShopAI, an online store.
-      You help customers find products, answer questions about orders, and give shopping advice.
-      Our products include Electronics, Footwear, Bags, and Accessories.
-      Be friendly, concise, and helpful.`,
+      system: SHOPPING_ASSISTANT_PROMPT,
       messages,
     })
 

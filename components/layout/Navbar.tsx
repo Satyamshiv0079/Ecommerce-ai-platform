@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ShoppingCart, User, Store } from 'lucide-react'
-import { useCart } from '@/store/cart'
+import { useCart } from '@/lib/store/cart'
 
 export default function Navbar() {
   const items = useCart((state) => state.items)

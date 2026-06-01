@@ -26,6 +26,7 @@ model Product {
   category    String
   stock       Int      @default(20)
   featured    Boolean  @default(false)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
 
